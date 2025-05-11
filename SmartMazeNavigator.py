@@ -400,62 +400,62 @@ class CSPMazeGenerator:
 ##### Bushra's Class 
 class AStar:
     def __init__(self, maze):
-        self.maze = maze
-        self.height, self.width = maze.shape
+        self.maze = maze   #making maze instance
+        self.height, self.width = maze.shape   #getting dimensions 
     
     def update_maze(self, maze):
         """Update the maze after it has been changed"""
-        self.maze = maze
-        self.height, self.width = maze.shape
+        self.maze = maze      #update maze instance
+        self.height, self.width = maze.shape   #update dimensions 
     
     def heuristic(self, a, b):
-        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])    #manhattan distance |x1-x2| + |y1 - y2|
     
-    def get_neighbors(self, node):
-        x, y = node
+    def get_neighbors(self, node):    #getting valid neighbouring nodes for example left,right,up,down that are possible
+        x, y = node    #taking the current nodes coordinates
         neighbors = []
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < self.width and 0 <= ny < self.height and self.maze[ny][nx] == 0:
-                neighbors.append((nx, ny))
+        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:   #for checking four possible directions
+            nx, ny = x + dx, y + dy   #calcuting the coordinates of the neighbour
+            if 0 <= nx < self.width and 0 <= ny < self.height and self.maze[ny][nx] == 0:   #checking if the neighbor node valid and we can move there
+                neighbors.append((nx, ny))  #if valid then add to list
         return neighbors
     
-    def find_path(self, start, end):
-        open_set = []
-        heapq.heappush(open_set, (0, start))
-        came_from = {}
-        g_score = {start: 0}
-        f_score = {start: self.heuristic(start, end)}
-        open_set_hash = {start}
-        visited = set()
+    def find_path(self, start, end):   #to find shortest path through A*
+        open_set = []            #priority queue
+        heapq.heappush(open_set, (0, start))    # score, node
+        came_from = {}                #tracks best path
+        g_score = {start: 0}            #cost from start to node
+        f_score = {start: self.heuristic(start, end)}   #cost(g_score)  + heuristic
+        open_set_hash = {start}    #quick lookup of nodes in openset
+        visited = set()    #track of all visited nodes
         
         while open_set:
-            _, current = heapq.heappop(open_set)
+            _, current = heapq.heappop(open_set)   #getting the node that has the lowest f_score
             open_set_hash.remove(current)
             visited.add(current)
             
-            if current == end:
+            if current == end:   #so that if we have reached the goal, we return the path
                 path = []
-                while current in came_from:
+                while current in came_from:   #backtracking
                     path.append(current)
                     current = came_from[current]
-                path.append(start)
-                path.reverse()
+                path.append(start)   #adding start node
+                path.reverse()    #reversing to get correct order
                 return path, visited
             
-            for neighbor in self.get_neighbors(current):
-                tentative_g_score = g_score[current] + 1
+            for neighbor in self.get_neighbors(current):   #to chekc all neighbours of the current node
+                tentative_g_score = g_score[current] + 1   #to calculate the g_score of the neighbor node
                 
-                if neighbor not in g_score or tentative_g_score < g_score[neighbor]:
-                    came_from[neighbor] = current
-                    g_score[neighbor] = tentative_g_score
-                    f_score[neighbor] = g_score[neighbor] + self.heuristic(neighbor, end)
+                if neighbor not in g_score or tentative_g_score < g_score[neighbor]:  #so that if this path is better than the previous one
+                    came_from[neighbor] = current    #update the best path
+                    g_score[neighbor] = tentative_g_score   #update the g_score
+                    f_score[neighbor] = g_score[neighbor] + self.heuristic(neighbor, end)  #update the f_score
                     
-                    if neighbor not in open_set_hash:
+                    if neighbor not in open_set_hash:   #if neighbor not in open_set update it 
                         heapq.heappush(open_set, (f_score[neighbor], neighbor))
                         open_set_hash.add(neighbor)
         
-        return [], visited
+        return [], visited   #if goal is not reached or open set is empty
 
 ### Waleed's Class
 class AIPlayer:
