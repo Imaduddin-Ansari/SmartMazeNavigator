@@ -457,19 +457,21 @@ class AStar:
         
         return [], visited   #if goal is not reached or open set is empty
 
-### Waleed's Class
+### making dis class for ai mode
+### it runs via min max as well as astarr adn uses the best possible for each move
+### it makes sure ai wins and when player near end it favors ai in all possible ways to make sure ai winss
 class AIPlayer:
     def __init__(self, maze, position, opponent_position):
         self.maze = maze
         self.position = position
         self.opponent_position = opponent_position
         self.astar = AStar(maze)
-        self.depth_limit = 3  # How many moves ahead to look
-        self.end = None  # Will be set later
-        self.path_to_goal = []  # Store calculated path to goal
-        self.path_recalculate_counter = 0  # Counter to periodically recalculate path
+        self.depth_limit = 3  #dis one shows how many moves it looks forwardd
+        self.end = None  #dis depends and shows where to end when ai donee
+        self.path_to_goal = []  # checkss which calculated to patthh
+        self.path_recalculate_counter = 0  # checksss best path each timee
         
-    def calculate_path_to_goal(self):
+    def calculate_path_to_goal(self):   ## dis function checks and fijnds whatevva path to take to endd
         """Calculate direct path to goal using A*"""
         if self.end:
             path, _ = self.astar.find_path(self.position, self.end)
@@ -480,23 +482,22 @@ class AIPlayer:
         
     def get_best_move(self):
         """Get the next best move for the AI"""
-        # Recalculate path occasionally or if we don't have one
+        # everytimee dis chwcks which is the best move from noww
         self.path_recalculate_counter += 1
         if not self.path_to_goal or self.path_recalculate_counter > 5:
             self.calculate_path_to_goal()
             self.path_recalculate_counter = 0
         
-        # If we have a path with at least 2 points (current + next)
+        
         if len(self.path_to_goal) >= 2:
-            # The next position is the second element in the path
-            # (first element is current position)
+            # findign second best one option that is to be takenn
             for i, pos in enumerate(self.path_to_goal):
                 if pos == self.position and i + 1 < len(self.path_to_goal):
                     return self.path_to_goal[i + 1]
         
-        # Fallback to original minimax approach if path is empty or invalid
         return self.get_minimax_move()
-    
+
+    ##using minmaxx fro movess
     def get_minimax_move(self):
         """Use minimax to find the best move (original method)"""
         print("Alpha Beta Being Used")
@@ -520,7 +521,9 @@ class AIPlayer:
             alpha = max(alpha, value)
         
         return best_move
-    
+
+
+     ##using minmaxx fro moving forward or backward whichever bestt
     def minimax(self, depth, is_maximizing, alpha, beta, current_pos, opponent_pos):
         if depth == 0 or self.is_terminal_state(current_pos, opponent_pos):
             return self.evaluate_state(current_pos, opponent_pos)
@@ -550,19 +553,19 @@ class AIPlayer:
         for dx, dy in [(0,1), (1,0), (0,-1), (-1,0)]:
             nx, ny = x + dx, y + dy
             if 0 <= nx < len(self.maze[0]) and 0 <= ny < len(self.maze):
-                if self.maze[ny][nx] == 0:  # Only valid moves
+                if self.maze[ny][nx] == 0:  # onli valid moves
                     moves.append((nx, ny))
         return moves
     
     def is_terminal_state(self, ai_pos, player_pos):
-        # Terminal if either reaches the end
+       ##for stoppin when reahced endd
         return ai_pos == self.end or player_pos == self.end
         
     def evaluate_state(self, ai_pos, player_pos):
-        # Favor states where AI is closer to end and player is farther
+        ##favoring aii when player clojee
         ai_dist = self.astar.heuristic(ai_pos, self.end)
         player_dist = self.astar.heuristic(player_pos, self.end)
-        return player_dist - ai_dist  # Higher is better for AI
+        return player_dist - ai_dist  ##higher is better for AI
 
 ### Bushra's Class with a mix of all of ours codes. 
 class Game:
